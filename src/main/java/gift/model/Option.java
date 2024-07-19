@@ -17,6 +17,9 @@ public class Option extends BasicEntity{
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
+    @Version
+    private Long version;
+
     protected Option() {}
 
     public Option(String name, int quantity) {
