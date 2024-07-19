@@ -46,12 +46,19 @@ public class OptionService {
     }
 
     @Transactional(readOnly = true)
-    public OptionResponse findOptionById(Long productId, Long optionId) {
+    public OptionResponse findOptionByProductId(Long productId, Long optionId) {
         Product product = productRepository.findProductAndOptionByIdFetchJoin(productId)
                 .orElseThrow(() -> new EntityNotFoundException("Product with id " + productId + " not found"));
         Option option = product.findOptionByOptionId(optionId);
         return OptionResponse.from(option);
+    }
 
+    @Transactional
+    public int subtractQuantity(Long productId, Long optionId, int amount) {
+        Product product = productRepository.findProductAndOptionByIdFetchJoin(productId)
+                .orElseThrow(() -> new EntityNotFoundException("Product with id " + productId + " not found"));
+        Option option = product.findOptionByOptionId(optionId);
+        return option.subtractQuantity(amount);
     }
 
     private void checkProductExist(Long productId) {
