@@ -35,12 +35,16 @@ public class Option extends BasicEntity{
         this.quantity = quantity;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
     public boolean isSameName(String theirName) {
         return name.equals(theirName);
+    }
+
+    public int subtractQuantity(int amount) {
+        if (amount > this.quantity) {
+            throw new IllegalArgumentException("Subtraction amount exceeds quantity");
+        }
+        this.quantity -= amount;
+        return this.quantity;
     }
 
     public String getName() {
@@ -53,5 +57,9 @@ public class Option extends BasicEntity{
 
     public Product getProduct() {
         return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
     }
 }

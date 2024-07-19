@@ -62,6 +62,13 @@ public class OptionService {
         optionRepository.deleteById(id);
     }
 
+    @Transactional
+    public int subOptionQuantity(Long id, int amount) {
+        Option option = optionRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Option with id " + id + " not found"));
+        return option.subtractQuantity(amount);
+    }
+
     private void checkProductExist(Long productId) {
         if(!productRepository.existsById(productId)) {
             throw new EntityNotFoundException("Product with id " + productId + " not found");

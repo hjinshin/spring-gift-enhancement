@@ -4,6 +4,8 @@ import gift.config.JpaConfig;
 import gift.model.Category;
 import gift.model.Option;
 import gift.model.Product;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,8 @@ class OptionRepositoryTest {
     private ProductRepository productRepository;
     @Autowired
     private CategoryRepository categoryRepository;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Test
     @DisplayName("id로 Product와 Fetch Join하여 조회 테스트[성공]")
@@ -73,5 +77,28 @@ class OptionRepositoryTest {
         // then
         assertThat(actual).hasSize(1);
         assertThat(actual.get(0)).isEqualTo(options.get(0));
+    }
+
+    @Test
+    @DisplayName("옵선 수량 빼기 작업 테스트[성공]")
+    void subtractOptionQuantity() {
+        // given
+        int quantity = 123;
+        int subtractAmount = 10;
+        int expectedQuantity = quantity - subtractAmount;
+        Category category = categoryRepository.save(new Category("cname", "ccolor", "cImage", ""));
+        List<Option> options = List.of(new Option("oName", quantity));
+        Product product = productRepository.save(new Product("pName", 0, "purl", category, options));
+        Long id = product.getOptions().get(0).getId();
+        Option option = optionRepository.findById(id).get();
+        option.subtractQuantity(subtractAmount);
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        Option actual = optionRepository.findById(id).get();
+
+        // then
+        assertThat(actual.getQuantity()).isEqualTo(expectedQuantity);
     }
 }
