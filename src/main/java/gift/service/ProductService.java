@@ -9,6 +9,7 @@ import gift.model.Category;
 import gift.model.Option;
 import gift.model.Product;
 import gift.repository.CategoryRepository;
+import gift.repository.OptionRepository;
 import gift.repository.ProductRepository;
 import gift.service.dto.CreateProductDto;
 import gift.service.dto.UpdateProductDto;
@@ -23,10 +24,12 @@ import java.util.List;
 public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final OptionRepository optionRepository;
 
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, OptionRepository optionRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.optionRepository = optionRepository;
     }
 
     @Transactional(readOnly = true)
@@ -118,6 +121,13 @@ public class ProductService {
         Option option = product.findOptionByOptionId(optionId);
         return OptionResponse.from(option);
 
+    }
+
+    @Transactional(timeout = 5)
+    public int subOptionQuantity(Long optionId, int amount) {
+        Option option = optionRepository.findByIdPessimisticReadLock(optionId)
+                .orElseThrow(() -> new EntityNotFoundException("Option with id " + optionId + " not found"));
+        return option.subtractQuantity(amount);
     }
 
     private void checkProductExist(Long id) {

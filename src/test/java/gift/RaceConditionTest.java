@@ -5,7 +5,7 @@ import gift.model.Option;
 import gift.model.Product;
 import gift.repository.CategoryRepository;
 import gift.repository.ProductRepository;
-import gift.service.OptionService;
+import gift.service.ProductService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class RaceConditionTest {
     @Autowired
     private CategoryRepository categoryRepository;
     @Autowired
-    private OptionService optionService;
+    private ProductService productService;
 
     @Test
     @DisplayName("동시에 삭제 요청[성공]-비관적락")
@@ -47,7 +47,7 @@ public class RaceConditionTest {
         for (int i = 0; i < threadCount; i++) {
             executorService.submit(() -> {
                 try {
-                    int q = optionService.subOptionQuantity(optionId, subtractAmount);
+                    int q = productService.subOptionQuantity(optionId, subtractAmount);
                 } catch (TransactionTimedOutException e) {
                     System.out.println("TimeOut");
                 }catch (Exception e) {
