@@ -1,6 +1,8 @@
 package gift.service;
 
 import gift.common.exception.EntityNotFoundException;
+import gift.controller.dto.request.OptionRequest;
+import gift.controller.dto.response.OptionResponse;
 import gift.controller.dto.response.PagingResponse;
 import gift.controller.dto.response.ProductResponse;
 import gift.model.Category;
@@ -81,5 +83,46 @@ public class ProductService {
                 .orElseThrow(() -> new EntityNotFoundException("Product with id " + id + " not found"));
         Option option = product.findOptionByOptionId(optionId);
         product.subOption(option);
+    }
+
+    @Transactional(readOnly = true)
+    public List<OptionResponse> getAllOptions(Long productId) {
+        Product product = productRepository.findProductAndOptionByIdFetchJoin(productId)
+                .orElseThrow(() -> new EntityNotFoundException("Product with id " + productId + " not found"));
+        return product.getOptions().stream()
+                .map(OptionResponse::from)
+                .toList();
+    }
+
+    @Transactional
+    public void addOption(OptionRequest.Create request) {
+        checkProductExist(request.productId());
+        Product product = productRepository.getReferenceById(request.productId());
+        Option option = new Option(request.name(), request.quantity(), product);
+        product.addOption(option);
+    }
+
+    @Transactional
+    public void updateOption(OptionRequest.Update request) {
+        Product product = productRepository.findProductAndOptionByIdFetchJoin(request.productId())
+                .orElseThrow(() -> new EntityNotFoundException("Product with id " + request.productId() + " not found"));
+        Option option = product.findOptionByOptionId(request.id());
+        product.checkDuplicateOptionName(request.id(), request.name());
+        option.updateOption(request.name(), request.quantity());
+    }
+
+    @Transactional(readOnly = true)
+    public OptionResponse findOptionById(Long id, Long optionId) {
+        Product product = productRepository.findProductAndOptionByIdFetchJoin(id)
+                .orElseThrow(() -> new EntityNotFoundException("Product with id " + id + " not found"));
+        Option option = product.findOptionByOptionId(optionId);
+        return OptionResponse.from(option);
+
+    }
+
+    private void checkProductExist(Long id) {
+        if(!productRepository.existsById(id)) {
+            throw new EntityNotFoundException("Product with id " + id + " not found");
+        }
     }
 }

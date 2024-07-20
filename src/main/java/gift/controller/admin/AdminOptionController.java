@@ -2,7 +2,6 @@ package gift.controller.admin;
 
 import gift.controller.dto.request.OptionRequest;
 import gift.controller.dto.response.OptionResponse;
-import gift.service.OptionService;
 import gift.service.ProductService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -17,11 +16,9 @@ import org.springframework.web.bind.annotation.*;
 public class AdminOptionController {
 
     private final ProductService productService;
-    private final OptionService optionService;
 
-    public AdminOptionController(ProductService productService, OptionService optionService) {
+    public AdminOptionController(ProductService productService) {
         this.productService = productService;
-        this.optionService = optionService;
     }
 
     @GetMapping("/new")
@@ -36,7 +33,7 @@ public class AdminOptionController {
         @PathVariable("id") @NotNull @Min(1) Long productId,
         @RequestParam("option-id") @NotNull @Min(1) Long optionId
     ) {
-        OptionResponse option = optionService.findOptionByProductId(productId, optionId);
+        OptionResponse option = productService.findOptionById(productId, optionId);
         model.addAttribute("option", option);
         return "option/editOption";
     }
@@ -44,14 +41,14 @@ public class AdminOptionController {
     @PostMapping("")
     public String createOption(
             @Valid @ModelAttribute OptionRequest.Create request) {
-        optionService.addOption(request);
+        productService.addOption(request);
         return "redirect:/admin/product/" + request.productId();
     }
 
     @PutMapping("")
     public String updateOption(
             @Valid @ModelAttribute OptionRequest.Update request) {
-        optionService.updateOption(request);
+        productService.updateOption(request);
         return "redirect:/admin/product/" + request.productId();
     }
 

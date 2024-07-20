@@ -4,7 +4,6 @@ import gift.controller.dto.request.ProductRequest;
 import gift.controller.dto.response.OptionResponse;
 import gift.controller.dto.response.PagingResponse;
 import gift.controller.dto.response.ProductResponse;
-import gift.service.OptionService;
 import gift.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,11 +24,9 @@ import java.util.List;
 @RequestMapping("/api/v1")
 public class ProductRestController {
     private final ProductService productService;
-    private final OptionService optionService;
 
-    public ProductRestController(ProductService productService, OptionService optionService) {
+    public ProductRestController(ProductService productService) {
         this.productService = productService;
-        this.optionService = optionService;
     }
 
     @GetMapping("/products")
@@ -82,7 +79,7 @@ public class ProductRestController {
     public ResponseEntity<List<OptionResponse>> getOptions(
             @PathVariable("id") @NotNull @Min(1) Long id
     ) {
-        List<OptionResponse> options = optionService.getAllOptions(id);
+        List<OptionResponse> options = productService.getAllOptions(id);
         return ResponseEntity.ok().body(options);
     }
 }
