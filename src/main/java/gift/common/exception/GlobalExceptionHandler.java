@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.TransactionTimedOutException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -77,6 +78,14 @@ public class GlobalExceptionHandler {
         problemDetail.setTitle("Illegal Argument");
         problemDetail.setDetail(e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
+    }
+
+    @ExceptionHandler(TransactionTimedOutException.class)
+    public ResponseEntity<ProblemDetail> handleTransactionTimedOutException(TransactionTimedOutException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.REQUEST_TIMEOUT);
+        problemDetail.setTitle("Time Out");
+        problemDetail.setDetail(e.getMessage());
+        return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).body(problemDetail);
     }
 
     @ExceptionHandler(Exception.class)

@@ -5,6 +5,7 @@ import gift.controller.dto.request.OptionRequest;
 import gift.controller.dto.response.OptionResponse;
 import gift.model.Option;
 import gift.model.Product;
+import gift.repository.OptionRepository;
 import gift.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +15,11 @@ import java.util.List;
 @Service
 public class OptionService {
     private final ProductRepository productRepository;
+    private final OptionRepository optionRepository;
 
-    public OptionService(ProductRepository productRepository) {
+    public OptionService(ProductRepository productRepository, OptionRepository optionRepository) {
         this.productRepository = productRepository;
+        this.optionRepository = optionRepository;
     }
 
     @Transactional(readOnly = true)
@@ -53,11 +56,10 @@ public class OptionService {
         return OptionResponse.from(option);
     }
 
-    @Transactional
-    public int subtractQuantity(Long productId, Long optionId, int amount) {
-        Product product = productRepository.findProductAndOptionByIdFetchJoin(productId)
-                .orElseThrow(() -> new EntityNotFoundException("Product with id " + productId + " not found"));
-        Option option = product.findOptionByOptionId(optionId);
+    @Transactional(timeout = 5)
+    public int subOptionQuantity(Long optionId, int amount) {
+        Option option = optionRepository.findByIdPessimisticReadLock(optionId)
+                .orElseThrow(() -> new EntityNotFoundException("Option with id " + optionId + " not found"));
         return option.subtractQuantity(amount);
     }
 
