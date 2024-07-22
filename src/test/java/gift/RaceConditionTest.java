@@ -43,6 +43,7 @@ public class RaceConditionTest {
         List<Option> options = List.of(new Option("oName", quantity));
         Product product = productRepository.save(new Product("pName", 0, "purl", category, options));
         Long optionId = product.getOptions().get(0).getId();
+        System.out.println(optionId);
 
         int threadCount = 100; // 스레드 개수
         ExecutorService executorService = Executors.newFixedThreadPool(32); // 스레드 풀 크기

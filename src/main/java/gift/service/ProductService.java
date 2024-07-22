@@ -124,8 +124,7 @@ public class ProductService {
     public int subtractQuantity(Long id, Long optionId, int amount) {
         Product product = productRepository.findProductAndOptionByIdFetchJoin(id)
                 .orElseThrow(() -> new EntityNotFoundException("Product with id " + id + " not found"));
-        Option option = product.findOptionByOptionId(optionId);
-        return option.subtractQuantity(amount);
+        return product.subtractOptionQuantity(optionId, amount);
     }
 
     private void checkProductExist(Long id) {

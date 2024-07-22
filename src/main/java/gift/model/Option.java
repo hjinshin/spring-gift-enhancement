@@ -48,6 +48,7 @@ public class Option extends BasicEntity{
         return quantity;
     }
 
+
     public boolean isSameName(String theirName) {
         return name.equals(theirName);
     }

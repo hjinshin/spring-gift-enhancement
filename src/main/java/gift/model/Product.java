@@ -67,6 +67,11 @@ public class Product extends BasicEntity{
         options.remove(entity);
     }
 
+    public int subtractOptionQuantity(Long optionId, int amount) {
+        Option option = findOptionByOptionId(optionId);
+        return option.subtractQuantity(amount);
+    }
+
     public Option findOptionByOptionId(Long optionId) {
         return options.stream()
                 .filter(option -> option.getId().equals(optionId))
